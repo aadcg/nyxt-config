@@ -1,0 +1,88 @@
+# Created 2024-08-13 Tue 17:41
+#+title: Nyxt Literate Config
+#+author: André A. Gomes
+A sample Nyxt config for educational purposes.
+
+#+begin_src lisp
+(in-package #:nyxt-user)
+
+(define-configuration browser
+  ((restore-session-on-startup-p nil)
+   (default-new-buffer-url (quri:uri "https://github.com/atlas-engineer/nyxt"))
+   (external-editor-program (if (member :flatpak *features*)
+                                "flatpak-spawn --host emacsclient -r"
+                                "emacsclient -r"))
+   ;; Sets the font for the Nyxt UI (not for webpages).
+   (theme (make-instance 'theme:theme :font-family "Iosevka"))
+   ;; Whether code sent to the socket gets executed.  You must understand the
+   ;; risks before enabling this: a privileged user with access to your system
+   ;; can then take control of the browser and execute arbitrary code under your
+   ;; user profile.
+   ;; (remote-execution-p t)
+   ))
+
+(define-configuration modable-buffer
+  ((prompt-on-mode-toggle-p t)))
+
+(define-configuration input-buffer
+  ((default-modes (pushnew 'nyxt/mode/emacs:emacs-mode %slot-value%))
+   (conservative-word-move t)))
+
+(define-configuration web-buffer
+  ((default-modes (append '(nyxt/mode/reduce-tracking:reduce-tracking-mode
+                            nyxt/mode/blocker:blocker-mode
+                            nyxt/mode/force-https:force-https-mode)
+                          %slot-value%))))
+
+(define-configuration context-buffer
+  ((search-auto-complete-p nil)
+   (search-always-auto-complete-p nil)))
+
+(define-configuration document-buffer
+  ((keep-search-marks-p nil)))
+
+(define-configuration prompt-buffer
+  ((mouse-support-p nil)))
+
+(define-configuration :search-buffer-mode
+  ((keyscheme-map
+    (keymaps:define-keyscheme-map "custom" (list :import %slot-value%)
+      nyxt/keyscheme:emacs
+      (list "C-f" 'nyxt/mode/search-buffer:search-buffer)))))
+
+(define-configuration :hint-mode
+  ((nyxt/mode/hint:hints-alphabet "KDJFLSAIEUROWPQCMVXZ")
+   (nyxt/mode/hint:hinting-type :vi)
+   (nyxt/mode/hint:show-hint-scope-p nil)
+   (keyscheme-map
+    (keymaps:define-keyscheme-map "custom" (list :import %slot-value%)
+      nyxt/keyscheme:emacs
+      (list "M-f" 'nyxt/mode/hint:follow-hint)))))
+
+(define-configuration :autofill-mode
+  ((nyxt/mode/autofill:autofills
+    (list (nyxt/mode/autofill:make-autofill :name "Name"
+                                            :fill "André A. Gomes")
+          (nyxt/mode/autofill:make-autofill :name "Email"
+                                            :fill "andremegafone@gmail.com")))))
+
+(define-configuration status-buffer ((glyph-mode-presentation-p t)))
+(define-configuration :force-https-mode ((glyph "HTTPS")))
+(define-configuration :blocker-mode ((glyph "block")))
+(define-configuration :reduce-tracking-mode ((glyph "no-track")))
+
+(defmethod format-status-tabs ((status status-buffer))
+  "Disable tabs section."
+  "")
+
+(define-configuration :document-mode
+  "Demo for users of non CJK or latin input methods (such as Bulgarian or Greek)."
+  ((keyscheme-map
+    (keymaps:define-keyscheme-map "custom" (list :import %slot-value%)
+      nyxt/keyscheme:emacs
+      (list
+       ;; By binding keycodes, it always works regardless of the input method
+       ;; set on the OS level.
+       "C-n" nil
+       "C-#57" 'scroll-down)))))
+#+end_src

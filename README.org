@@ -1,9 +1,9 @@
-# Created 2024-08-13 Tue 17:41
+# Created 2024-08-22 Thu 11:30
 #+title: Nyxt Literate Config
 #+author: André A. Gomes
 A sample Nyxt config for educational purposes.
 
-#+begin_src lisp
+#+begin_src lisp :tangle ~/.config/nyxt/config.lisp
 (in-package #:nyxt-user)
 
 (define-configuration browser
@@ -13,7 +13,9 @@ A sample Nyxt config for educational purposes.
                                 "flatpak-spawn --host emacsclient -r"
                                 "emacsclient -r"))
    ;; Sets the font for the Nyxt UI (not for webpages).
-   (theme (make-instance 'theme:theme :font-family "Iosevka"))
+   (theme (make-instance 'theme:theme
+                         :font-family "Iosevka"
+                         :monospace-font-family "Iosevka"))
    ;; Whether code sent to the socket gets executed.  You must understand the
    ;; risks before enabling this: a privileged user with access to your system
    ;; can then take control of the browser and execute arbitrary code under your

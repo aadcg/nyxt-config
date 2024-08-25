@@ -1,4 +1,4 @@
-# Created 2024-08-22 Thu 11:30
+# Created 2024-08-26 Mon 00:17
 #+title: Nyxt Literate Config
 #+author: André A. Gomes
 A sample Nyxt config for educational purposes.
@@ -76,6 +76,13 @@ A sample Nyxt config for educational purposes.
 (defmethod format-status-tabs ((status status-buffer))
   "Disable tabs section."
   "")
+
+(defmethod ffi-buffer-make :after ((buffer nyxt/renderer/gtk:gtk-buffer))
+  "Set fonts for the WebKitGTK renderer."
+  (let ((settings (webkit:webkit-web-view-get-settings (nyxt/renderer/gtk:gtk-object buffer))))
+    (setf (webkit:webkit-settings-serif-font-family settings) "Iosevka"
+          (webkit:webkit-settings-sans-serif-font-family settings) "Iosevka"
+          (webkit:webkit-settings-monospace-font-family settings) "Iosevka")))
 
 (define-configuration :document-mode
   "Demo for users of non CJK or latin input methods (such as Bulgarian or Greek)."
